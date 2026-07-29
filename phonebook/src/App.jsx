@@ -16,9 +16,16 @@ const App = () => {
       name: newName
     }
 
-    setPersons(persons.concat(personObject))
-    setNewName('')
-    console.log(persons)
+    const targetJson = JSON.stringify(personObject);
+    const hasEqualValue = persons.some(item => JSON.stringify(item) === targetJson);
+
+    if (hasEqualValue){
+      alert(`${personObject.name} is already added to phonebook`)
+    } else {
+      setPersons(persons.concat(personObject))
+      setNewName('')
+      console.log(persons)
+    }
   }
 
   return (
