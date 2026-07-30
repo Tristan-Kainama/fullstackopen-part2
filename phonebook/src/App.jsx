@@ -36,7 +36,14 @@ const PersonForm = (props) => {
 const Persons = (props) => {
   return (
     <>
-      {props.filteredPersons.map((person, i) => <p key={i}>{person.name} {person.number}</p>)}
+      {props.filteredPersons.map((person) => (
+        <div key={person.id}>
+          <p>
+            {person.name} {person.number}
+            <button onClick={() => props.deletePerson(person.id)}>delete</button>
+          </p>
+        </div>
+      ))}
     </>
   )
 }
@@ -62,6 +69,23 @@ const App = () => {
     const newSearch = event.target.value
     setSearch(newSearch)
     setFilteredPersons(persons.filter(person => person.name.toLowerCase().includes(newSearch.toLowerCase())))
+  }
+
+  const deletePerson = (id) => {
+    const personToDelete = persons.find(person => person.id === id)
+
+    if (window.confirm(`Delete ${personToDelete.name}?`)) {
+      personService
+        .remove(id)
+        .then(() => {
+          const updatedPersons = persons.filter(person => person.id !== id)
+          setPersons(updatedPersons)
+          setFilteredPersons(updatedPersons.filter(person => person.name.toLowerCase().includes(search.toLowerCase())))
+        })
+        .catch(() => {
+          alert(`Information of ${personToDelete.name} has already been removed from the server`)
+        })
+    }
   }
 
   const handleNameChange = (event) => {
@@ -107,7 +131,7 @@ const App = () => {
       <PersonForm addPerson={addPerson} newName={newName} handleNameChange={handleNameChange} newNumber={newNumber} handleNumberChange={handleNumberChange} />
 
       <h2>Numbers</h2>
-      <Persons filteredPersons={filteredPersons}/>
+      <Persons filteredPersons={filteredPersons} deletePerson={deletePerson}/>
     </div>
   )
 }
