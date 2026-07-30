@@ -103,22 +103,34 @@ const App = () => {
       number: newNumber
     }
 
-    const targetJson = JSON.stringify(personObject);
-    const hasEqualValue = persons.some(item => JSON.stringify(item) === targetJson);
+    const existingPerson = persons.find(person => person.name.toLowerCase() === personObject.name.toLowerCase())
 
-    if (hasEqualValue){
-      alert(`${personObject.name} is already added to phonebook`)
+    if (existingPerson) {
+      if (window.confirm(`${personObject.name} is already added to phonebook, replace the old number with a new one?`)) {
+        const updatedPerson = { ...existingPerson, number: personObject.number }
+
+        personService
+          .change(existingPerson.id, updatedPerson)
+          .then(returnedPerson => {
+            const updatedPersons = persons.map(person => person.id === existingPerson.id ? returnedPerson : person)
+            setPersons(updatedPersons)
+            setFilteredPersons(updatedPersons.filter(person => person.name.toLowerCase().includes(search.toLowerCase())))
+            setNewName('')
+            setNewNumber('')
+          })
+      }
     } else {
       setSearch('')
 
       personService
-      .create(personObject)
-      .then(returnedPerson => {
-        setPersons(persons.concat(returnedPerson))
-        setFilteredPersons(persons.concat(returnedPerson))
-        setNewName('')
-        setNewNumber('')
-      })
+        .create(personObject)
+        .then(returnedPerson => {
+          const updatedPersons = persons.concat(returnedPerson)
+          setPersons(updatedPersons)
+          setFilteredPersons(updatedPersons)
+          setNewName('')
+          setNewNumber('')
+        })
     }
   }
 
