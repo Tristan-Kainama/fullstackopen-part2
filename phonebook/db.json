@@ -24,6 +24,11 @@
       "name": "Tristan Kainama",
       "number": "62-858-1195-0780",
       "id": "x7O1hmQVAm4"
+    },
+    {
+      "name": "Dominicus Irawan",
+      "number": "156765432",
+      "id": "HnQlov6u3Sk"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
