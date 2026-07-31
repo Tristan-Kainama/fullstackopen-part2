@@ -31,7 +31,7 @@ const PersonForm = (props) => {
       </form>
     </>
   )
-}
+} 
 
 const Persons = (props) => {
   return (
@@ -48,11 +48,12 @@ const Persons = (props) => {
   )
 }
 
-const Notification = ({ message, clearMessage }) => {
+const Notification = ({ message, clearMessage, isError }) => { 
+  if (message === null) {
+    return null
+  }
+  
   useEffect(() => {
-    if (message === null) {
-      return
-    }
 
     const timeoutId = setTimeout(() => {
       clearMessage()
@@ -61,12 +62,15 @@ const Notification = ({ message, clearMessage }) => {
     return () => clearTimeout(timeoutId)
   }, [message, clearMessage])
 
-  if (message === null) {
-    return null
+  let color = 'green';
+
+  if (isError) {
+    color = 'red'
   }
 
+
   return (
-    <div className="message">
+    <div style={{color: color}} className="message">
       {message}
     </div>
   )
@@ -89,6 +93,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [search, setSearch] = useState('')
   const [message, setMessage] = useState(null)
+  const [isError, setIsError] = useState(true)
 
   const handleSearch = (event) => {
     const newSearch = event.target.value
@@ -107,9 +112,15 @@ const App = () => {
           setPersons(updatedPersons)
           setFilteredPersons(updatedPersons.filter(person => person.name.toLowerCase().includes(search.toLowerCase())))
           setMessage(`Deleted ${personToDelete.name}`)
+          setIsError(false)
         })
         .catch(() => {
-          alert(`Information of ${personToDelete.name} has already been removed from the server`)
+          const newPersons = persons.filter(person => person.name !== personToDelete.name)
+
+          setPersons(newPersons)
+          setFilteredPersons(newPersons.filter(person => person.name.toLowerCase().includes(search.toLowerCase())))
+          setMessage(`Information of ${personToDelete.name} has already been removed from the server`)
+          setIsError(true)
         })
     }
   }
@@ -144,6 +155,15 @@ const App = () => {
             setNewName('')
             setNewNumber('')
             setMessage(`Changed number of ${personObject.name}`)
+            setIsError(false)
+          })
+          .catch(() => {
+            const newPersons = persons.filter(person => person.name !== personObject.name)
+
+            setPersons(newPersons)
+            setFilteredPersons(newPersons.filter(person => person.name.toLowerCase().includes(search.toLowerCase())))
+            setMessage(`Information of ${personToDelete.name} has already been removed from the server`)
+            setIsError(true)
           })
       }
     } else {
@@ -158,6 +178,15 @@ const App = () => {
           setNewName('')
           setNewNumber('')
           setMessage(`Added ${personObject.name}`)
+          setIsError(false)
+        })
+        .catch(() => {
+          const newPersons = persons.filter(person => person.name !== personObject.name)
+
+          setPersons(newPersons)
+          setFilteredPersons(newPersons.filter(person => person.name.toLowerCase().includes(search.toLowerCase())))
+          setMessage(`Information of ${personToDelete.name} has already been removed from the server`)
+          setIsError(true)
         })
     }
   }
@@ -165,7 +194,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={message} clearMessage={() => setMessage(null)} />
+      <Notification message={message} clearMessage={() => setMessage(null)} isError={isError} />
       <Filter search={search} handleSearch={handleSearch}/>
 
       <h2>Add a new</h2>

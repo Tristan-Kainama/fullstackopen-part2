@@ -1,19 +1,9 @@
 {
   "persons": [
     {
-      "name": "Arto Hellas",
-      "number": "040-123456",
-      "id": "1"
-    },
-    {
-      "name": "Ada Lovelace",
-      "number": "39-44-5323523",
-      "id": "2"
-    },
-    {
-      "name": "Tristan Kainama",
-      "number": "+6285811950780",
-      "id": "gTfD0WGVAeg"
+      "name": "yes Ahh",
+      "number": "7654321",
+      "id": "mYRtDwCy8wM"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
