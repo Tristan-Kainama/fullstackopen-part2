@@ -48,6 +48,30 @@ const Persons = (props) => {
   )
 }
 
+const Notification = ({ message, clearMessage }) => {
+  useEffect(() => {
+    if (message === null) {
+      return
+    }
+
+    const timeoutId = setTimeout(() => {
+      clearMessage()
+    }, 3000)
+
+    return () => clearTimeout(timeoutId)
+  }, [message, clearMessage])
+
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div className="message">
+      {message}
+    </div>
+  )
+}
+
 const App = () => {
   const [persons, setPersons] = useState([])
   const [filteredPersons, setFilteredPersons] = useState([]) 
@@ -64,6 +88,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [search, setSearch] = useState('')
+  const [message, setMessage] = useState(null)
 
   const handleSearch = (event) => {
     const newSearch = event.target.value
@@ -81,6 +106,7 @@ const App = () => {
           const updatedPersons = persons.filter(person => person.id !== id)
           setPersons(updatedPersons)
           setFilteredPersons(updatedPersons.filter(person => person.name.toLowerCase().includes(search.toLowerCase())))
+          setMessage(`Deleted ${personToDelete.name}`)
         })
         .catch(() => {
           alert(`Information of ${personToDelete.name} has already been removed from the server`)
@@ -117,6 +143,7 @@ const App = () => {
             setFilteredPersons(updatedPersons.filter(person => person.name.toLowerCase().includes(search.toLowerCase())))
             setNewName('')
             setNewNumber('')
+            setMessage(`Changed number of ${personObject.name}`)
           })
       }
     } else {
@@ -130,6 +157,7 @@ const App = () => {
           setFilteredPersons(updatedPersons)
           setNewName('')
           setNewNumber('')
+          setMessage(`Added ${personObject.name}`)
         })
     }
   }
@@ -137,6 +165,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message} clearMessage={() => setMessage(null)} />
       <Filter search={search} handleSearch={handleSearch}/>
 
       <h2>Add a new</h2>
