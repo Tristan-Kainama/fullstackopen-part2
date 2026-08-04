@@ -11,7 +11,7 @@ function SearchForm({ search, handleCountryChange }) {
   )
 }
 
-function Output({ filteredAmount, filteredCountries }) {
+function Output({ filteredAmount, filteredCountries, handleShowCountry }) {
   if (filteredAmount > 10) {
     return <p>Too many matches, specify another filter</p>
   }
@@ -22,6 +22,7 @@ function Output({ filteredAmount, filteredCountries }) {
         {filteredCountries.map((country) => (
           <div key={country.name.common}>
             <p>{country.name.common}</p>
+            <button onClick={() => handleShowCountry(country)}>Show</button>
           </div>
         ))}
       </>
@@ -73,12 +74,21 @@ function App() {
     setFilteredCountries(nextFilteredCountries)
   }
 
+  const handleShowCountry = (country) => {
+    setSearch(country.name.common)
+    setFilteredCountries([country])
+  }
+
   const filteredAmount = filteredCountries.length
 
   return (
     <div>
       <SearchForm search={search} handleCountryChange={handleCountryChange} />
-      <Output filteredAmount={filteredAmount} filteredCountries={filteredCountries} />
+      <Output
+        filteredAmount={filteredAmount}
+        filteredCountries={filteredCountries}
+        handleShowCountry={handleShowCountry}
+      />
     </div>
   )
 }
