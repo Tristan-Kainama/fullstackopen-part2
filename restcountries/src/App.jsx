@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import countriesService from './services/countries.js'
+import axios from 'axios'
 
 function SearchForm({ search, handleCountryChange }) {
   return (
@@ -8,6 +9,67 @@ function SearchForm({ search, handleCountryChange }) {
         find countries <input value={search} onChange={handleCountryChange} />
       </div>
     </form>
+  )
+}
+
+function CountryWeather({ country }) {
+  const [temp, setTemp] = useState(null)
+  const [wind, setWind] = useState(null)
+  const [img, setImg] = useState('')
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const apiKey = import.meta.env.VITE_SOME_KEY
+
+    if (!apiKey) {
+      setLoading(false)
+      return
+    }
+
+    const capital = country.capital?.join(' ') || country.name.common
+
+    axios
+      .get(`https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(capital)}&limit=1&appid=${apiKey}`)
+      .then((response) => {
+        const location = response.data[0]
+        if (!location) {
+          return null
+        }
+
+        return axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${location.lat}&lon=${location.lon}&appid=${apiKey}`)
+      })
+      .then((response) => {
+        if (!response) {
+          return
+        }
+
+        setTemp((response.data.main.temp - 273.15).toFixed(1))
+        setWind(response.data.wind.speed)
+        setImg(`https://openweathermap.org/img/wn/${response.data.weather[0].icon}@2x.png`)
+      })
+      .catch(() => {
+        setTemp(null)
+        setWind(null)
+        setImg('')
+      })
+      .finally(() => setLoading(false))
+  }, [country])
+
+  if (loading) {
+    return <p>Loading weather...</p>
+  }
+
+  if (temp === null) {
+    return <p>Weather unavailable</p>
+  }
+
+  return (
+    <>
+      <h2>Weather in {country.capital?.join(', ')}</h2>
+      <p>Temperature {temp} °C</p>
+      <img src={img} alt="Weather icon" width="150" />
+      <p>Wind {wind} m/s</p>
+    </>
   )
 }
 
@@ -44,6 +106,8 @@ function Output({ filteredAmount, filteredCountries, handleShowCountry }) {
           ))}
         </ul>
         <img src={country.flags?.png} alt={`Flag of ${country.name.common}`} width="150" />
+
+        <CountryWeather country={country} />
       </div>
     )
   }
